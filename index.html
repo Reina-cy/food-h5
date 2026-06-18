@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>三餐风味集</title>
+    <style>
+        /* ===== 全局重置 & 色彩 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", serif;
+            background-color: #FBF6F0;
+            color: #4A3520;
+            display: flex;
+            justify-content: center;
+        }
+        .app {
+            width: 100%;
+            max-width: 420px;
+            background-color: #FBF6F0;
+            padding: 0 18px 40px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.04);
+            min-height: 100vh;
+        }
+        /* ===== 顶部导航 ===== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0 12px;
+            border-bottom: 2px solid #EDE5DC;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            background: #FBF6F0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .site-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #D2691E;
+            letter-spacing: 1px;
+        }
+        .site-name small {
+            font-weight: 300;
+            font-size: 11px;
+            color: #C4A88A;
+            letter-spacing: 2px;
+            display: block;
+            margin-top: -2px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 14px;
+            font-size: 14px;
+        }
+        .nav-links a {
+            color: #A67B5B;
+            text-decoration: none;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .nav-links a:hover,
+        .nav-links a:active {
+            color: #D2691E;
+            border-bottom-color: #D2691E;
+        }
+        /* ===== 轮播图 ===== */
+        .carousel {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            aspect-ratio: 16 / 9;
+            background-color: #EDE5DC;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .carousel-slide .text-wrap {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.5));
+            color: #fff;
+            text-align: center;
+        }
+        .carousel-slide .title-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .carousel-slide .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .carousel-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+        .carousel-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .carousel-dots span.active {
+            background: #D2691E;
+            width: 20px;
+            border-radius: 4px;
+        }
+        /* ===== 公众号简介 ===== */
+        .intro-box {
+            background: #FFFFFF;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #F0EAE3;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            text-align: center;
+        }
+        .intro-box .intro-icon {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .intro-box p {
+            font-size: 15px;
+            color: #4A3520;
+            line-height: 1.9;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+        .intro-box p em {
+            font-style: normal;
+            color: #D2691E;
+            font-weight: 500;
+        }
+        /* ===== 装饰分隔 ===== */
+        .divider-dots {
+            text-align: center;
+            color: #E0D6CC;
+            font-size: 16px;
+            letter-spacing: 6px;
+            margin: 6px 0 16px;
+            user-select: none;
+        }
+        /* ===== 栏目标题 ===== */
+        .section-label {
+            font-size: 12px;
+            color: #B5977A;
+            letter-spacing: 4px;
+            text-align: center;
+            margin: 6px 0 16px;
+            font-weight: 300;
+        }
+        .section-label span {
+            background: #FBF6F0;
+            padding: 0 12px;
+        }
+        /* ===== 栏目卡片网格 ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .card-grid .card-full {
+            grid-column: 1 / -1;
+        }
+        .menu-card {
+            background: #FFFFFF;
+            border-radius: 14px;
+            padding: 16px 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border-left: 4px solid #D4A373;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .menu-card:active {
+            transform: scale(0.97);
+            background: #F8F2EC;
+        }
+        .menu-card .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        .menu-card h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #4A3520;
+        }
+        .menu-card p {
+            font-size: 12px;
+            color: #B5977A;
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+        .menu-card.highlight {
+            border-left-color: #FFB07C;
+            background: #FFF9F2;
+        }
+        .menu-card.highlight h4 {
+            color: #D2691E;
+        }
+        /* ===== 内容区块 ===== */
+        .content-section {
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid #EDE5DC;
+            scroll-margin-top: 80px;
+        }
+        .content-section .tag {
+            display: inline-block;
+            font-size: 11px;
+            background: #EDE5DC;
+            color: #A67B5B;
+            padding: 3px 12px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+        .content-section h2 {
+            font-size: 20px;
+            color: #4A3520;
+            margin-bottom: 6px;
+        }
+        .content-section .meta {
+            font-size: 12px;
+            color: #B5977A;
+            margin-bottom: 14px;
+        }
+        .content-img {
+            width: 100%;
+            border-radius: 14px;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .content-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .content-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 18px 16px;
+        }
+        .content-card .sub-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #D2691E;
+            margin: 14px 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .content-card p,
+        .content-card li {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #4A3520;
+        }
+        .content-card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 8px;
+        }
+        .content-card ul li {
+            padding: 3px 18px;
+            position: relative;
+        }
+        .content-card ul li::before {
+            content: "•";
+            color: #D2691E;
+            position: absolute;
+            left: 0;
+        }
+        .qr-box {
+            width: 120px;
+            height: 120px;
+            background: #EDE5DC;
+            border-radius: 12px;
+            margin: 10px auto;
+            overflow: hidden;
+            border: 1px dashed #C4A88A;
+        }
+        .qr-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <!-- 顶部固定导航 -->
+    <div class="top-bar">
+        <div class="site-name">
+            三餐风味集
+            <small>人间烟火美食专栏</small>
+        </div>
+        <div class="nav-links">
+            <a href="#recipe">食谱</a>
+            <a href="#shop">探店</a>
+            <a href="#story">食记</a>
+            <a href="#follow">关注</a>
+        </div>
+    </div>
+
+    <!-- 首页轮播（在线美食图） -->
+    <div class="carousel">
+        <div class="carousel-track" id="carouselTrack">
+            <div class="carousel-slide">
+                <img src="https://picsum.photos/id/292/800/450" alt="家常美食">
+                <div class="text-wrap">
+                    <div class="title-text">家常三餐食谱合集</div>
+                    <div class="label">简单易上手一日三餐</div>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <img src="https://picsum.photos/id/431/800/450" alt="城市探店">
+                <div class="text-wrap">
+                    <div class="title-text">城市探店美食专栏</div>
+                    <div class="label">挖掘各地地道小吃老店</div>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <img src="https://picsum.photos/id/276/800/450" alt="食物故事">
+                <div class="text-wrap">
+                    <div class="title-text">食物故事馆</div>
+                    <div class="label">藏在饭菜里的温暖故事</div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-dots" id="dotsBox">
+            <span class="active" data-index="0"></span>
+            <span data-index="1"></span>
+            <span data-index="2"></span>
+        </div>
+    </div>
+
+    <!-- 简介卡片 -->
+    <div class="intro-box">
+        <span class="intro-icon">🍴</span>
+        <p>这里分享家常菜谱、城市美食探店、食物温暖故事，<em>每日更新</em>，记录人间烟火。</p>
+    </div>
+
+    <div class="divider-dots">···</div>
+
+    <div class="section-label"><span>栏目导航</span></div>
+
+    <!-- 四大栏目卡片 -->
+    <div class="card-grid">
+        <a href="#recipe" class="menu-card">
+            <div class="icon">🍳</div>
+            <h4>家常三餐食谱</h4>
+            <p>早中晚全套家常做法</p>
+        </a>
+        <a href="#shop" class="menu-card">
+            <div class="icon">🏙️</div>
+            <h4>城市探店专栏</h4>
+            <p>各地特色小店测评</p>
+        </a>
+        <a href="#story" class="menu-card highlight">
+            <div class="icon">📖</div>
+            <h4>食物故事馆</h4>
+            <p>美食背后人情回忆</p>
+        </a>
+        <a href="#follow" class="menu-card">
+            <div class="icon">❤️</div>
+            <h4>关注入口</h4>
+            <p>扫码每日获取更新</p>
+        </a>
+    </div>
+
+    <!-- 1.家常三餐食谱区块 -->
+    <div class="content-section" id="recipe">
+        <span class="tag">食谱专区</span>
+        <h2>家常三餐食谱</h2>
+        <div class="meta">2026家常菜合集 · 新手友好</div>
+        <div class="content-img">
+            <img src="https://picsum.photos/id/292/800/500" alt="一日三餐家常菜">
+        </div>
+        <div class="content-card">
+            <div class="sub-title">一日三餐简易菜谱</div>
+            <ul>
+                <li>早餐：杂粮粥、蒸饺、三明治、豆浆油条</li>
+                <li>午餐：番茄炒蛋、小炒肉、清蒸鱼、时蔬小炒</li>
+                <li>晚餐：清淡汤、凉拌菜、焖饭、简易炖菜</li>
+            </ul>
+            <p style="margin-top:10px;">全部步骤简化，少油健康，厨房小白也能轻松复刻。</p>
+        </div>
+    </div>
+
+    <!-- 2.城市探店专栏 -->
+    <div class="content-section" id="shop">
+        <span class="tag">城市探店</span>
+        <h2>城市探店专栏</h2>
+        <div class="meta">全国实地美食探店</div>
+        <div class="content-img">
+            <img src="https://picsum.photos/id/431/800/500" alt="街边特色小店">
+        </div>
+        <div class="content-card">
+            <div class="sub-title">各地宝藏小吃店</div>
+            <ul>
+                <li>街边老字号平价小吃铺</li>
+                <li>本地人私藏小众私房菜馆</li>
+                <li>夜市、特色早餐摊位合集</li>
+            </ul>
+            <p style="margin-top:10px;">附带人均、地址、必点菜，外出吃饭不踩雷。</p>
+        </div>
+    </div>
+
+    <!-- 3.食物故事馆 -->
+    <div class="content-section" id="story">
+        <span class="tag">食物故事馆</span>
+        <h2>食物故事馆</h2>
+        <div class="meta">美食与乡愁、温情故事</div>
+        <div class="content-img">
+            <img src="https://picsum.photos/id/276/800/500" alt="暖心美食">
+        </div>
+        <div class="content-card">
+            <div class="sub-title">藏在饭菜里的回忆</div>
+            <p>一道家常菜承载一段回忆，每一口食物都藏着亲情、乡愁与相遇。</p>
+            <ul>
+                <li>长辈独传的拿手好菜</li>
+                <li>在外思念的家乡味道</li>
+                <li>和好友共度的街边美食</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4.关注入口（二维码位置） -->
+    <div class="content-section" id="follow">
+        <span class="tag">关注我们</span>
+        <h2>关注入口</h2>
+        <div class="meta">食谱/探店/故事每日更新</div>
+        <div class="content-img">
+            <img src="https://picsum.photos/id/488/800/500" alt="美食推送">
+        </div>
+        <div class="content-card" style="text-align:center;">
+            <div class="qr-box">
+                <!-- 替换二维码只需要把图片命名 qrcode.jpg 和html放一起 -->
+                <img src="qrcode.jpg" alt="公众号二维码">
+            </div>
+            <p>扫码关注账号，每日推送全新美食内容</p>
+            <p style="margin-top:8px;font-size:13px;color:#A67B5B;">三餐食谱｜城市探店｜美食故事</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// 轮播自动切换
+const track = document.getElementById('carouselTrack');
+const dots = document.querySelectorAll('.carousel-dots span');
+let currentIndex = 0;
+const slideCount = 3;
+
+function updateCarousel() {
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentIndex));
+}
+function nextSlide() {
+    currentIndex = (currentIndex + 1) % slideCount;
+    updateCarousel();
+}
+setInterval(nextSlide, 3000);
+dots.forEach(dot => dot.onclick = () => {
+    currentIndex = Number(dot.dataset.index);
+    updateCarousel();
+})
+</script>
+</body>
+</html>
